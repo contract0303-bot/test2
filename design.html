@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heatwave Prediction through Data Assimilation</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AOS (Animate on Scroll) -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+/* ======================
+   NEUMORPHISM DESIGN SYSTEM
+   ====================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-primary: #e8eef2;
+    --bg-secondary: #f5f7fa;
+    --shadow-dark: -8px -8px 16px rgba(255, 255, 255, 0.8), 8px 8px 16px rgba(174, 174, 192, 0.15);
+    --shadow-inset: inset -4px -4px 8px rgba(255, 255, 255, 0.8), inset 4px 4px 8px rgba(174, 174, 192, 0.2);
+    --shadow-hover: -12px -12px 24px rgba(255, 255, 255, 0.8), 12px 12px 24px rgba(174, 174, 192, 0.15);
+    --accent-primary: #667eea;
+    --accent-secondary: #764ba2;
+    --accent-tertiary: #f093fb;
+    --text-primary: #2d3436;
+    --text-secondary: #636e72;
+    --success: #1dd1a1;
+    --danger: #ee5a6f;
+    --warning: #f0a250;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-primary);
+    background: linear-gradient(135deg, #e8eef2 0%, #f5f7fa 100%);
+    min-height: 100vh;
+    opacity: 0;
+    animation: fadeIn 0.6s ease-in forwards;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: var(--shadow-dark); }
+    50% { box-shadow: var(--shadow-hover); }
+}
+
+/* ======================
+   NAVIGATION
+   ====================== */
+
+.navbar {
+    background: var(--bg-primary) !important;
+    box-shadow: var(--shadow-dark);
+    padding: 1rem 0;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.navbar.scrolled {
+    box-shadow: var(--shadow-hover);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: var(--accent-primary) !important;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-dark);
+}
+
+.navbar-brand i {
+    margin-right: 0.5rem;
+    color: var(--accent-secondary);
+}
+
+.nav-link {
+    margin: 0 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary) !important;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 0.5rem 1rem !important;
+    border-radius: 10px;
+}
+
+.nav-link:hover {
+    color: var(--accent-primary) !important;
+    box-shadow: var(--shadow-dark);
+    transform: translateY(-2px);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    transition: width 0.3s ease;
+    border-radius: 2px;
+}
+
+.nav-link:hover::after {
+    width: 80%;
+}
+
+/* ======================
+   HERO SECTION
+   ====================== */
+
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #e8eef2 0%, #f5f7fa 100%);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(240, 147, 251, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: float 8s ease-in-out infinite reverse;
+}
+
+.hero-content {
+    z-index: 2;
+    position: relative;
+    max-width: 900px;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 50%, var(--accent-tertiary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    animation: fadeInDown 0.8s ease-out;
+}
+
+.hero .lead {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.hero .btn {
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 15px;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-dark);
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+    cursor: pointer;
+}
+
+.hero .btn:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+    color: white;
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ======================
+   SECTIONS & CONTAINERS
+   ====================== */
+
+section {
+    padding: 5rem 0;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.highlight {
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ======================
+   NEUMORPHIC CARDS
+   ====================== */
+
+.neo-card {
+    background: var(--bg-primary);
+    border-radius: 20px;
+    box-shadow: var(--shadow-dark);
+    padding: 2rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.neo-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.neo-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-8px);
+}
+
+.neo-card:hover::before {
+    opacity: 1;
+}
+
+.neo-card h4, .neo-card h5 {
+    color: var(--accent-primary);
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.neo-card p {
+    color: var(--text-secondary);
+    line-height: 1.8;
+}
+
+/* Intro & Conclusion Boxes */
+.intro-box, .conclusion-box {
+    background: var(--bg-primary);
+    border-radius: 20px;
+    box-shadow: var(--shadow-dark);
+    padding: 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+}
+
+.intro-box:hover, .conclusion-box:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-10px);
+}
+
+/* ======================
+   HIGHLIGHT BOXES
+   ====================== */
+
+.highlight-box {
+    background: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: 15px;
+    margin-top: 1.5rem;
+    box-shadow: var(--shadow-inset);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.highlight-box i {
+    font-size: 1.8rem;
+    color: var(--accent-primary);
+}
+
+.highlight-box strong {
+    color: var(--accent-primary);
+    font-weight: 600;
+}
+
+/* ======================
+   PLACEHOLDER BOX
+   ====================== */
+
+.placeholder-box {
+    background: var(--bg-primary);
+    min-height: 400px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    box-shadow: var(--shadow-dark);
+    border: 2px dashed rgba(102, 126, 234, 0.2);
+    transition: all 0.3s ease;
+}
+
+.placeholder-box:hover {
+    box-shadow: var(--shadow-hover);
+    border-color: rgba(102, 126, 234, 0.4);
+}
+
+.placeholder-box i {
+    font-size: 4rem;
+    color: var(--accent-primary);
+    opacity: 0.3;
+}
+
+/* ======================
+   GOAL CARDS
+   ====================== */
+
+.goal-card {
+    background: var(--bg-primary);
+    padding: 2rem;
+    border-radius: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-dark);
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    overflow: hidden;
+}
+
+.goal-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.goal-card:hover {
+    transform: translateY(-12px);
+    box-shadow: var(--shadow-hover);
+}
+
+.goal-card:hover::before {
+    transform: scaleX(1);
+}
+
+.goal-number {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    opacity: 0.2;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+.goal-card i {
+    font-size: 3rem;
+    color: var(--accent-primary);
+    margin-bottom: 1rem;
+}
+
+.goal-card h4 {
+    margin-bottom: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.goal-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* ======================
+   LISTS & CUSTOM STYLES
+   ====================== */
+
+.custom-list {
+    list-style: none;
+    padding: 0;
+}
+
+.custom-list li {
+    padding: 0.8rem 0;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    line-height: 1.7;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.custom-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--accent-primary);
+    font-weight: 700;
+}
+
+.custom-list li:last-child {
+    border-bottom: none;
+}
+
+.custom-list strong {
+    color: var(--accent-primary);
+    font-weight: 700;
+}
+
+/* ======================
+   FORMULA BOX
+   ====================== */
+
+.formula-box {
+    background: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: 15px;
+    margin-top: 1rem;
+    box-shadow: var(--shadow-inset);
+    border: 1px solid rgba(102, 126, 234, 0.15);
+}
+
+.formula-box p {
+    margin: 0.5rem 0;
+    font-weight: 700;
+    color: var(--accent-primary);
+    font-size: 1.1rem;
+}
+
+.formula-card {
+    background: var(--bg-primary);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: var(--shadow-dark);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.formula-card:hover {
+    box-shadow: var(--shadow-hover);
+    border-color: rgba(102, 126, 234, 0.4);
+}
+
+.formula-text {
+    font-size: 1.8rem;
+    color: var(--accent-primary);
+    font-weight: 700;
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    margin: 1rem 0;
+    font-family: 'Courier New', monospace;
+    box-shadow: var(--shadow-inset);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+/* ======================
+   TIMELINE
+   ====================== */
+
+.timeline {
+    position: relative;
+    padding: 1rem 0;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 30px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--accent-primary) 0%, var(--accent-secondary) 50%, var(--accent-tertiary) 100%);
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+}
+
+.timeline-item {
+    margin-bottom: 2rem;
+    padding-left: 100px;
+    position: relative;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 60px;
+    height: 60px;
+    background: var(--bg-primary);
+    border: 3px solid var(--accent-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-dark);
+    font-weight: 700;
+    color: var(--accent-primary);
+    transition: all 0.3s ease;
+}
+
+.timeline-item:hover .timeline-marker {
+    box-shadow: var(--shadow-hover);
+    transform: scale(1.1);
+}
+
+.timeline-content {
+    background: var(--bg-primary);
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: var(--shadow-dark);
+    border-left: 4px solid var(--accent-primary);
+    transition: all 0.3s ease;
+}
+
+.timeline-content:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateX(5px);
+}
+
+.timeline-content h5 {
+    color: var(--accent-primary);
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.timeline-content p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* ======================
+   DATA TABLES
+   ====================== */
+
+.table-responsive {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: var(--shadow-dark);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-primary);
+}
+
+.data-table thead {
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    color: white;
+}
+
+.data-table th {
+    padding: 1.2rem;
+    font-weight: 700;
+    text-align: center;
+    font-size: 0.95rem;
+    border-bottom: none;
+}
+
+.data-table td {
+    padding: 1rem 1.2rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    color: var(--text-secondary);
+}
+
+.data-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.data-table tbody tr:hover {
+    background-color: var(--bg-secondary);
+    box-shadow: inset 0 2px 8px rgba(102, 126, 234, 0.1);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table td:first-child {
+    text-align: left;
+    font-weight: 700;
+    color: var(--accent-primary);
+}
+
+.negative { color: #e74c3c; font-weight: 700; }
+.positive { color: #1dd1a1; font-weight: 700; }
+
+/* ======================
+   CHARTS
+   ====================== */
+
+.chart-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.comp-btn {
+    padding: 0.8rem 1.8rem;
+    background: var(--bg-primary);
+    color: var(--accent-primary);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-dark);
+}
+
+.comp-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--accent-primary);
+}
+
+.comp-btn.active {
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    color: white;
+    box-shadow: var(--shadow-hover);
+    border-color: transparent;
+}
+
+/* Chart Card */
+.chart-card {
+    background: var(--bg-primary);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: var(--shadow-dark);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+}
+
+.chart-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-8px);
+}
+
+/* ======================
+   FINDING CARDS
+   ====================== */
+
+.finding-card {
+    background: var(--bg-primary);
+    padding: 1.8rem;
+    border-radius: 15px;
+    box-shadow: var(--shadow-dark);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.finding-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+}
+
+.finding-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-hover);
+}
+
+.finding-card h5 {
+    color: var(--accent-primary);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.finding-card i {
+    margin-right: 0.5rem;
+    color: var(--success);
+}
+
+/* ======================
+   TEAM CARDS
+   ====================== */
+
+.team-card {
+    background: var(--bg-primary);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: var(--shadow-dark);
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    overflow: hidden;
+}
+
+.team-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+}
+
+.team-card:hover {
+    transform: translateY(-12px);
+    box-shadow: var(--shadow-hover);
+}
+
+.team-avatar {
+    width: 90px;
+    height: 90px;
+    margin: -45px auto 1rem;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    color: white;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-dark);
+    transition: all 0.3s ease;
+}
+
+.team-card:hover .team-avatar {
+    transform: scale(1.1) rotateY(10deg);
+    box-shadow: var(--shadow-hover);
+}
+
+.team-card h4 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.team-card .role {
+    color: var(--accent-primary);
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: var(--bg-secondary);
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    display: inline-block;
+    box-shadow: var(--shadow-inset);
+}
+
+.team-list {
+    text-align: left;
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0 0;
+}
+
+.team-list li {
+    padding: 0.6rem 0;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.team-list li:last-child {
+    border-bottom: none;
+}
+
+/* ======================
+   CONCLUSION
+   ====================== */
+
+.conclusion-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.conclusion-list li {
+    padding: 1.2rem 0;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    line-height: 1.8;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.conclusion-list li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent-primary);
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.conclusion-list li:last-child {
+    border-bottom: none;
+}
+
+.conclusion-list strong {
+    color: var(--accent-primary);
+    font-weight: 700;
+}
+
+.highlight-section {
+    background: var(--bg-secondary);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: var(--shadow-inset);
+    border: 2px solid rgba(102, 126, 234, 0.15);
+    transition: all 0.3s ease;
+}
+
+.highlight-section:hover {
+    border-color: rgba(102, 126, 234, 0.3);
+    box-shadow: var(--shadow-dark);
+}
+
+.highlight-section h5 {
+    color: var(--accent-primary);
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.highlight-section strong {
+    color: var(--accent-primary);
+    font-weight: 700;
+}
+
+/* ======================
+   FOOTER
+   ====================== */
+
+.footer {
+    background: linear-gradient(135deg, #2d3436 0%, #1e272e 100%);
+    color: #bbb;
+    padding: 3rem 0 1rem;
+    margin-top: 3rem;
+}
+
+.footer h5 {
+    color: white;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 0.6rem;
+}
+
+.footer-links a {
+    color: #bbb;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-links a:hover {
+    color: var(--accent-primary);
+    transform: translateX(5px);
+}
+
+.references-list {
+    list-style: none;
+    padding: 0;
+}
+
+.references-list li {
+    margin-bottom: 1.2rem;
+    line-height: 1.8;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.references-list li::before {
+    content: '📚';
+    position: absolute;
+    left: 0;
+}
+
+.references-list em {
+    color: #aaa;
+    font-style: italic;
+}
+
+/* ======================
+   RESPONSIVE
+   ====================== */
+
+@media (max-width: 768px) {
+    .hero h1 { font-size: 2.2rem; }
+    .hero .lead { font-size: 1rem; }
+    .section-title { font-size: 2rem; }
+    .timeline::before { left: 15px; }
+    .timeline-item { padding-left: 70px; }
+    .timeline-marker { width: 45px; height: 45px; font-size: 1rem; left: -7.5px; }
+    .data-table th, .data-table td { padding: 0.8rem 0.5rem; font-size: 0.85rem; }
+    .chart-controls { flex-direction: column; }
+    .comp-btn { width: 100%; }
+    .team-card { margin-top: 2rem; }
+    .neo-card, .goal-card, .formula-card, .chart-card, .intro-box, .conclusion-box {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero { min-height: 80vh; padding: 1rem; }
+    .hero h1 { font-size: 1.6rem; margin-bottom: 0.5rem; }
+    .hero .lead { font-size: 0.95rem; margin-bottom: 1.5rem; }
+    .section-title { font-size: 1.5rem; }
+    .placeholder-box { min-height: 250px; }
+    .formula-text { font-size: 1.3rem; }
+    .goal-number { font-size: 2.5rem; }
+    .goal-card i { font-size: 2.5rem; }
+    .team-avatar { width: 70px; height: 70px; margin-top: -35px; font-size: 2rem; }
+}
+
+@media print {
+    .navbar, .footer { display: none; }
+    body { color: #000; background: white; }
+    .btn, .chart-controls { display: none; }
+}
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top" style="top: 0; z-index: 1000;">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#home">
+                <i class="fas fa-thermometer-half"></i> Heatwave
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#intro">Introduction</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#goals">Goals</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#background">Background</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#method">Method</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#results">Results</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#team">Team</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#conclusion">Conclusion</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="display-3 fw-bold mb-3">
+                Understanding Heatwave Prediction<br>through Data Assimilation
+            </h1>
+            <p class="lead mb-4">
+                Initial Condition Sensitivity · EnKF · Observation Density · Heatwave Forecasting
+            </p>
+            <a href="#intro" class="btn">
+                <i class="fas fa-arrow-down"></i> Explore
+            </a>
+        </div>
+    </section>
+
+    <!-- Introduction -->
+    <section id="intro" class="py-5">
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-6">
+                    <div class="intro-box">
+                        <h2 class="section-title mb-4">
+                            <span class="highlight">Introduction</span>
+                        </h2>
+                        <p class="fs-5 mb-3" style="color: var(--text-secondary);">
+                            Heatwaves are among the most impactful extreme weather events. Accurate prediction is important for public safety, energy demand, and climate risk management.
+                        </p>
+                        <p class="fs-5 mb-3" style="color: var(--text-secondary);">
+                            However, numerical weather prediction is highly sensitive to initial conditions, meaning small errors in the initial atmospheric state can grow into large forecast errors.
+                        </p>
+                        <div class="highlight-box">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>
+                                <strong>Key Insight:</strong> Data assimilation can significantly improve model predictions by combining observations with model forecasts.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="placeholder-box">
+                        <i class="fas fa-chart-line"></i>
+                        <p>Visualization Area</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research Goals -->
+    <section id="goals" class="py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">
+                <span class="highlight">Research Goals</span>
+            </h2>
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="goal-card">
+                        <div class="goal-number">01</div>
+                        <i class="fas fa-chart-bar"></i>
+                        <h4>Goal 1</h4>
+                        <p>Investigate how forecast error changes during normal and heatwave years.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="goal-card">
+                        <div class="goal-number">02</div>
+                        <i class="fas fa-map-marker"></i>
+                        <h4>Goal 2</h4>
+                        <p>Analyze how observation density affects data assimilation performance.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="goal-card">
+                        <div class="goal-number">03</div>
+                        <i class="fas fa-filter"></i>
+                        <h4>Goal 3</h4>
+                        <p>Apply EnKF-based data assimilation using ERA5 and ASOS data.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Background -->
+    <section id="background" class="py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">
+                <span class="highlight">Data Assimilation Background</span>
+            </h2>
+            
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="neo-card">
+                        <h4><i class="fas fa-brain"></i> Data Assimilation Concept</h4>
+                        <p class="mb-3">
+                            Data assimilation combines model background information with observations to produce a more accurate atmospheric state called the analysis.
+                        </p>
+                        <div class="formula-box">
+                            <p>⚡ analysis = background + Kalman gain × innovation</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="neo-card">
+                        <h4><i class="fas fa-database"></i> Data Definition</h4>
+                        <ul class="custom-list">
+                            <li><strong>Background:</strong> ERA5 model estimate</li>
+                            <li><strong>Observation:</strong> ASOS measured temperature</li>
+                            <li><strong>Innovation:</strong> observation − background</li>
+                            <li><strong>Analysis:</strong> DA-corrected temperature</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mt-3">
+                <div class="col-12">
+                    <div class="formula-card">
+                        <h5 class="mb-3">Kalman Gain Equation</h5>
+                        <div class="formula-text">
+                            K = P<sup>b</sup>H<sup>T</sup>(HP<sup>b</sup>H<sup>T</sup> + R)<sup>-1</sup>
+                        </div>
+                        <p class="text-muted mt-3 small">
+                            <strong>P<sup>b</sup></strong> = Background Error Covariance | 
+                            <strong>H</strong> = Observation Operator | 
+                            <strong>R</strong> = Observation Error Covariance
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Method -->
+    <section id="method" class="py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">
+                <span class="highlight">Research Method</span>
+            </h2>
+
+            <div class="row mb-5 g-4">
+                <div class="col-lg-6">
+                    <h4 class="mb-4"><i class="fas fa-database"></i> Data & Regions</h4>
+                    <div class="neo-card">
+                        <ul class="custom-list">
+                            <li><strong>ERA5:</strong> 2m temperature data for July–August 2021 and 2024</li>
+                            <li><strong>ASOS:</strong> Surface temperature observations</li>
+                        </ul>
+                    </div>
+                    <div class="neo-card mt-4">
+                        <h5 class="mb-3">Study Regions</h5>
+                        <ul class="custom-list">
+                            <li><strong>SE:</strong> Seoul/Gyeonggi (observation-dense region)</li>
+                            <li><strong>GW:</strong> Gangwon (observation-sparse and complex-terrain region)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="placeholder-box">
+                        <i class="fas fa-map"></i>
+                        <p>Map Visualization Area</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <h4 class="mb-4"><i class="fas fa-timeline"></i> Research Timeline</h4>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker">1</div>
+                            <div class="timeline-content">
+                                <h5>Stage 1: Data Preparation</h5>
+                                <p>ERA5 & ASOS data collection and preprocessing</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker">2</div>
+                            <div class="timeline-content">
+                                <h5>Stage 2: EnKF Implementation</h5>
+                                <p>Kalman gain calculation and assimilation module development</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker">3</div>
+                            <div class="timeline-content">
+                                <h5>Stage 3: Time Analysis</h5>
+                                <p>2021 vs 2024 heatwave performance comparison</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker">4</div>
+                            <div class="timeline-content">
+                                <h5>Stage 4: Spatial Analysis</h5>
+                                <p>Observation density impact analysis (SE vs GW)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results -->
+    <section id="results" class="py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">
+                <span class="highlight">Research Results</span>
+            </h2>
+
+            <!-- Time Analysis -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h4 class="mb-4"><i class="fas fa-clock"></i> Time Analysis: 2021 vs 2024</h4>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Case</th>
+                                    <th>Free Run RMSE</th>
+                                    <th>Analysis RMSE</th>
+                                    <th>RMSE Reduction</th>
+                                    <th>Improvement Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>SE 2021</strong></td>
+                                    <td>1.1393</td>
+                                    <td>0.9660</td>
+                                    <td>0.1733</td>
+                                    <td>15.21%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GW 2021</strong></td>
+                                    <td>1.7813</td>
+                                    <td>1.5281</td>
+                                    <td>0.2532</td>
+                                    <td>14.21%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>SE 2024</strong></td>
+                                    <td>0.9916</td>
+                                    <td>0.8351</td>
+                                    <td>0.1565</td>
+                                    <td>15.79%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GW 2024</strong></td>
+                                    <td>1.9563</td>
+                                    <td>1.6665</td>
+                                    <td>0.2898</td>
+                                    <td>14.81%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row g-4 mb-5">
+                <div class="col-lg-6">
+                    <div class="chart-card">
+                        <canvas id="timeChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="chart-card">
+                        <canvas id="spatialChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spatial Analysis -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h4 class="mb-4"><i class="fas fa-map-marker"></i> Spatial Analysis: SE vs GW OSE Experiment</h4>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Case</th>
+                                    <th>Background RMSE</th>
+                                    <th>Analysis RMSE</th>
+                                    <th>RMSE Reduction</th>
+                                    <th>Improvement Rate</th>
+                                    <th>Mean Increment</th>
+                                    <th>Mean Abs. Increment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>SE 2024</strong></td>
+                                    <td>0.9939</td>
+                                    <td>0.7560</td>
+                                    <td>0.2378</td>
+                                    <td>23.93%</td>
+                                    <td><span class="negative">-0.219</span></td>
+                                    <td>0.376</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>GW 2024</strong></td>
+                                    <td>1.9557</td>
+                                    <td>1.4927</td>
+                                    <td>0.4630</td>
+                                    <td>23.67%</td>
+                                    <td><span class="positive">0.692</span></td>
+                                    <td>0.843</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Comparison Chart -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="chart-card">
+                        <div class="chart-controls">
+                            <button class="comp-btn active" data-metric="rmse">
+                                <i class="fas fa-chart-bar"></i> RMSE
+                            </button>
+                            <button class="comp-btn" data-metric="improvement">
+                                <i class="fas fa-percentage"></i> Improvement Rate
+                            </button>
+                            <button class="comp-btn" data-metric="increment">
+                                <i class="fas fa-adjust"></i> Increment
+                            </button>
+                        </div>
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Findings -->
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="finding-card">
+                        <h5><i class="fas fa-check-circle"></i> SE Region Characteristics</h5>
+                        <ul class="custom-list">
+                            <li>~24% RMSE reduction</li>
+                            <li>Negative increments: ERA5 overestimation</li>
+                            <li>High observation density region</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="finding-card">
+                        <h5><i class="fas fa-check-circle"></i> GW Region Characteristics</h5>
+                        <ul class="custom-list">
+                            <li>~24% RMSE reduction</li>
+                            <li>Positive increments: ERA5 underestimation</li>
+                            <li>Sparse observations, complex terrain</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team -->
+    <section id="team" class="py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">
+                <span class="highlight">Research Team</span>
+            </h2>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="team-card">
+                        <div class="team-avatar">A</div>
+                        <h4>Member A — Data Pipeline</h4>
+                        <p class="role">Data Collection & Preprocessing</p>
+                        <ul class="team-list">
+                            <li>Downloaded ERA5 data using CDS API</li>
+                            <li>Collected ASOS observations from KMA portal</li>
+                            <li>Preprocessing: Korea domain cropping, unit conversion, missing value handling</li>
+                            <li>Configured shared Google Drive workspace</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="team-card">
+                        <div class="team-avatar">B</div>
+                        <h4>Member B — EnKF Core</h4>
+                        <p class="role">EnKF Implementation</p>
+                        <ul class="team-list">
+                            <li>Implemented Kalman gain calculation</li>
+                            <li>Developed ensemble generation and update logic</li>
+                            <li>Built reusable EnKF modules for team-wide experiments</li>
+                            <li>Designed common framework for all experiments</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="team-card">
+                        <div class="team-avatar">C</div>
+                        <h4>Member C — Time Analysis</h4>
+                        <p class="role">Experiment 1 (Time Comparison)</p>
+                        <ul class="team-list">
+                            <li>Added perturbation experiment modules</li>
+                            <li>Compared normal year (2021) vs heatwave year (2024)</li>
+                            <li>Conducted SE and GW ensemble experiments</li>
+                            <li>Visualized RMSE time series</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="team-card">
+                        <div class="team-avatar">D</div>
+                        <h4>Member D — Spatial Analysis</h4>
+                        <p class="role">Experiment 2 (Spatial Comparison)</p>
+                        <ul class="team-list">
+                            <li>Implemented OSE (Observing System Experiment) module</li>
+                            <li>Compared dense vs sparse observation networks</li>
+                            <li>Conducted SE vs GW experiments</li>
+                            <li>Visualized analysis increment maps</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Conclusion -->
+    <section id="conclusion" class="py-5">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">
+                <span class="highlight">Conclusion</span>
+            </h2>
+
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="conclusion-box">
+                        <ul class="conclusion-list">
+                            <li>
+                                <strong>Regional Performance:</strong> Data assimilation improved temperature estimates in both regions, but GW required stronger corrections due to larger background errors.
+                            </li>
+                            <li>
+                                <strong>Time & Spatial Comparison:</strong> DA reduced RMSE in both time and spatial comparison experiments.
+                            </li>
+                            <li>
+                                <strong>Observation Density Impact:</strong> Observation density and regional characteristics affected correction magnitude.
+                            </li>
+                            <li>
+                                <strong>Gangwon Characteristics:</strong> Showed larger correction, likely due to sparse observations and complex terrain.
+                            </li>
+                            <li>
+                                <strong>Practical Significance:</strong> The experiment demonstrates the practical role of DA in heatwave prediction.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="highlight-section">
+                        <h5 class="mb-3">🔍 Key Insight</h5>
+                        <p class="fs-5">
+                            This research demonstrates how <strong>observation density</strong> and <strong>regional characteristics</strong> critically influence data assimilation performance. 
+                            For extreme weather prediction like heatwaves, the accuracy of initial conditions is paramount, and data assimilation significantly improves model forecasts.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- References -->
+    <section class="py-5" style="background: var(--bg-primary);">
+        <div class="container">
+            <h4 class="mb-4"><i class="fas fa-book"></i> References</h4>
+            <ul class="references-list">
+                <li>Domeisen et al. (2023). Prediction and projection of heatwaves. <em>Nature Reviews Earth & Environment</em>.</li>
+                <li>Lei et al. (2025). Overview and prospect of data assimilation in numerical weather prediction.</li>
+                <li>Kotsuki et al. (2025). Ensemble data assimilation to diagnose AI-based weather prediction models.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5><i class="fas fa-thermometer-half"></i> Heatwave Prediction Research</h5>
+                    <p class="text-muted">Data Assimilation for Improved Heatwave Forecasting</p>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5>Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="#intro">Introduction</a></li>
+                        <li><a href="#results">Results</a></li>
+                        <li><a href="#team">Team</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5>Methodology</h5>
+                    <p class="text-muted small">
+                        EnKF · ERA5 · ASOS · Data Assimilation
+                    </p>
+                </div>
+            </div>
+            <hr style="border-color: rgba(255,255,255,0.1);">
+            <div class="text-center text-muted">
+                <p>&copy; 2026 Heatwave Prediction & Data Assimilation Research Team. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+// Initialize AOS
+AOS.init({ duration: 1000, once: true, offset: 100 });
+
+// Navbar scroll effect
+window.addEventListener('scroll', function() {
+    const navbar = document.querySelector('.navbar');
+    if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+    } else {
+        navbar.classList.remove('scrolled');
+    }
+});
+
+// Chart configuration
+const chartConfig = {
+    plugins: {
+        legend: {
+            labels: { font: { size: 12, weight: 600 }, padding: 20, usePointStyle: true }
+        }
+    },
+    scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(102, 126, 234, 0.05)' } },
+        x: { grid: { display: false } }
+    }
+};
+
+// Time Analysis Chart
+const timeChartCtx = document.getElementById('timeChart');
+if (timeChartCtx) {
+    new Chart(timeChartCtx, {
+        type: 'bar',
+        data: {
+            labels: ['SE 2021', 'GW 2021', 'SE 2024', 'GW 2024'],
+            datasets: [
+                {
+                    label: 'Free Run RMSE',
+                    data: [1.1393, 1.7813, 0.9916, 1.9563],
+                    backgroundColor: 'rgba(238, 90, 111, 0.8)',
+                    borderColor: 'rgba(238, 90, 111, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8
+                },
+                {
+                    label: 'Analysis RMSE',
+                    data: [0.9660, 1.5281, 0.8351, 1.6665],
+                    backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8
+                }
+            ]
+        },
+        options: {
+            ...chartConfig,
+            responsive: true,
+            plugins: { ...chartConfig.plugins, title: { display: true, text: 'RMSE Comparison: Free Run vs Analysis', font: { size: 14, weight: 'bold' } } }
+        }
+    });
+}
+
+// Spatial Analysis Chart
+const spatialChartCtx = document.getElementById('spatialChart');
+if (spatialChartCtx) {
+    new Chart(spatialChartCtx, {
+        type: 'radar',
+        data: {
+            labels: ['Bg RMSE', 'An RMSE', 'Reduction', 'Improvement', 'Mean Inc.'],
+            datasets: [
+                {
+                    label: 'SE 2024',
+                    data: [0.9939, 0.7560, 0.2378, 23.93, 0.376],
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                },
+                {
+                    label: 'GW 2024',
+                    data: [1.9557, 1.4927, 0.4630, 23.67, 0.843],
+                    borderColor: 'rgba(240, 147, 251, 1)',
+                    backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(240, 147, 251, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }
+            ]
+        },
+        options: {
+            ...chartConfig,
+            responsive: true,
+            plugins: { ...chartConfig.plugins, title: { display: true, text: 'Spatial Analysis Comparison: SE vs GW', font: { size: 14, weight: 'bold' } } },
+            scales: { r: { beginAtZero: true, grid: { color: 'rgba(102, 126, 234, 0.1)' } } }
+        }
+    });
+}
+
+// Comparison Chart
+let currentMetric = 'rmse';
+const comparisonChartCtx = document.getElementById('comparisonChart');
+let comparisonChart = null;
+
+const metricsData = {
+    rmse: {
+        labels: ['SE 2024', 'GW 2024'],
+        datasets: [
+            { label: 'Background RMSE', data: [0.9939, 1.9557], backgroundColor: 'rgba(238, 90, 111, 0.8)', borderColor: 'rgba(238, 90, 111, 1)', borderWidth: 2 },
+            { label: 'Analysis RMSE', data: [0.7560, 1.4927], backgroundColor: 'rgba(102, 126, 234, 0.8)', borderColor: 'rgba(102, 126, 234, 1)', borderWidth: 2 }
+        ],
+        title: 'RMSE Comparison'
+    },
+    improvement: {
+        labels: ['SE 2024', 'GW 2024'],
+        datasets: [
+            { label: 'Improvement Rate (%)', data: [23.93, 23.67], backgroundColor: 'rgba(29, 209, 161, 0.8)', borderColor: 'rgba(29, 209, 161, 1)', borderWidth: 2 }
+        ],
+        title: 'Improvement Rate Comparison'
+    },
+    increment: {
+        labels: ['SE 2024', 'GW 2024'],
+        datasets: [
+            { label: 'Mean Increment', data: [-0.219, 0.692], backgroundColor: ['rgba(9, 132, 227, 0.8)', 'rgba(240, 147, 251, 0.8)'], borderColor: ['rgba(9, 132, 227, 1)', 'rgba(240, 147, 251, 1)'], borderWidth: 2 },
+            { label: 'Mean Abs. Increment', data: [0.376, 0.843], backgroundColor: ['rgba(102, 126, 234, 0.5)', 'rgba(240, 147, 251, 0.5)'], borderColor: ['rgba(102, 126, 234, 1)', 'rgba(240, 147, 251, 1)'], borderWidth: 2, borderDash: [5, 5] }
+        ],
+        title: 'Increment Comparison'
+    }
+};
+
+function updateComparisonChart() {
+    const data = metricsData[currentMetric];
+    if (comparisonChart) {
+        comparisonChart.data = { labels: data.labels, datasets: data.datasets };
+        comparisonChart.options.plugins.title.text = data.title;
+        comparisonChart.update();
+    } else if (comparisonChartCtx) {
+        comparisonChart = new Chart(comparisonChartCtx, {
+            type: currentMetric === 'improvement' ? 'doughnut' : 'bar',
+            data: { labels: data.labels, datasets: data.datasets },
+            options: {
+                ...chartConfig,
+                responsive: true,
+                indexAxis: currentMetric === 'improvement' ? undefined : 'y',
+                plugins: { ...chartConfig.plugins, title: { display: true, text: data.title, font: { size: 14, weight: 'bold' } } }
+            }
+        });
+    }
+}
+
+if (comparisonChartCtx) updateComparisonChart();
+
+// Event listeners
+document.querySelectorAll('.comp-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.comp-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentMetric = this.dataset.metric;
+        updateComparisonChart();
+    });
+});
+
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        const href = this.getAttribute('href');
+        if (href !== '#' && document.querySelector(href)) {
+            e.preventDefault();
+            document.querySelector(href).scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+});
+
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', function() {
+        const navbarCollapse = document.querySelector('.navbar-collapse');
+        if (navbarCollapse.classList.contains('show')) {
+            new bootstrap.Collapse(navbarCollapse).hide();
+        }
+    });
+});
+
+console.log('%c🌡️ Heatwave Prediction through Data Assimilation', 'font-size: 16px; font-weight: bold; color: #667eea;');
+console.log('%cNeumorphism Design Edition', 'font-size: 12px; color: #764ba2;');
+    </script>
+</body>
+</html>
