@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heatwave Prediction through Data Assimilation</title>
+    <title>Understanding Heatwave Prediction through Data Assimilation</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -19,7 +19,7 @@
     
     <style>
 /* ======================
-   NEUMORPHISM DESIGN SYSTEM
+   GLOBAL STYLES
    ====================== */
 
 * {
@@ -29,19 +29,17 @@
 }
 
 :root {
-    --bg-primary: #e8eef2;
-    --bg-secondary: #f5f7fa;
-    --shadow-dark: -8px -8px 16px rgba(255, 255, 255, 0.8), 8px 8px 16px rgba(174, 174, 192, 0.15);
-    --shadow-inset: inset -4px -4px 8px rgba(255, 255, 255, 0.8), inset 4px 4px 8px rgba(174, 174, 192, 0.2);
-    --shadow-hover: -12px -12px 24px rgba(255, 255, 255, 0.8), 12px 12px 24px rgba(174, 174, 192, 0.15);
-    --accent-primary: #667eea;
-    --accent-secondary: #764ba2;
-    --accent-tertiary: #f093fb;
-    --text-primary: #2d3436;
-    --text-secondary: #636e72;
+    --primary: #667eea;
+    --secondary: #764ba2;
+    --accent: #f093fb;
     --success: #1dd1a1;
     --danger: #ee5a6f;
     --warning: #f0a250;
+    --info: #0984e3;
+    --light: #f8f9fa;
+    --dark: #2d3436;
+    --text: #2d3436;
+    --border: #dfe6e9;
 }
 
 html {
@@ -50,25 +48,16 @@ html {
 
 body {
     font-family: 'Poppins', sans-serif;
-    color: var(--text-primary);
-    background: linear-gradient(135deg, #e8eef2 0%, #f5f7fa 100%);
-    min-height: 100vh;
+    color: var(--text);
+    background-color: #fff;
     opacity: 0;
-    animation: fadeIn 0.6s ease-in forwards;
+    animation: fadeIn 0.5s ease-in forwards;
 }
 
 @keyframes fadeIn {
-    to { opacity: 1; }
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-}
-
-@keyframes glow {
-    0%, 100% { box-shadow: var(--shadow-dark); }
-    50% { box-shadow: var(--shadow-hover); }
+    to {
+        opacity: 1;
+    }
 }
 
 /* ======================
@@ -76,68 +65,42 @@ body {
    ====================== */
 
 .navbar {
-    background: var(--bg-primary) !important;
-    box-shadow: var(--shadow-dark);
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.2);
     padding: 1rem 0;
     transition: all 0.3s ease;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-.navbar.scrolled {
-    box-shadow: var(--shadow-hover);
 }
 
 .navbar-brand {
     font-size: 1.5rem;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     font-weight: 700;
-    color: var(--accent-primary) !important;
     transition: all 0.3s ease;
-    padding: 0.5rem 1rem;
-    border-radius: 12px;
 }
 
 .navbar-brand:hover {
     transform: scale(1.05);
-    box-shadow: var(--shadow-dark);
-}
-
-.navbar-brand i {
-    margin-right: 0.5rem;
-    color: var(--accent-secondary);
 }
 
 .nav-link {
     margin: 0 0.5rem;
     font-weight: 500;
-    color: var(--text-primary) !important;
     transition: all 0.3s ease;
     position: relative;
-    padding: 0.5rem 1rem !important;
-    border-radius: 10px;
-}
-
-.nav-link:hover {
-    color: var(--accent-primary) !important;
-    box-shadow: var(--shadow-dark);
-    transform: translateY(-2px);
 }
 
 .nav-link::after {
     content: '';
     position: absolute;
-    bottom: 5px;
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: 0;
+    left: 0;
     width: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    height: 2px;
+    background: #fff;
     transition: width 0.3s ease;
-    border-radius: 2px;
 }
 
 .nav-link:hover::after {
-    width: 80%;
+    width: 100%;
 }
 
 /* ======================
@@ -149,234 +112,156 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #e8eef2 0%, #f5f7fa 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite;
+    color: white;
+    text-align: center;
     padding: 2rem;
     position: relative;
     overflow: hidden;
 }
 
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
 .hero::before {
     content: '';
     position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 800px;
-    height: 800px;
-    background: radial-gradient(circle, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: float 6s ease-in-out infinite;
-}
-
-.hero::after {
-    content: '';
-    position: absolute;
-    bottom: -30%;
-    left: -5%;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(240, 147, 251, 0.05) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: float 8s ease-in-out infinite reverse;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 1;
 }
 
 .hero-content {
     z-index: 2;
     position: relative;
     max-width: 900px;
-    text-align: center;
 }
 
 .hero h1 {
     font-size: 3.5rem;
     font-weight: 800;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 50%, var(--accent-tertiary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
     line-height: 1.2;
-    animation: fadeInDown 0.8s ease-out;
 }
 
 .hero .lead {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     margin-bottom: 2rem;
-    color: var(--text-secondary);
-    font-weight: 400;
-    animation: fadeInUp 0.8s ease-out 0.2s both;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+    font-weight: 300;
 }
 
 .hero .btn {
-    padding: 1rem 2.5rem;
+    padding: 0.8rem 2.5rem;
     font-size: 1.1rem;
     font-weight: 600;
-    border-radius: 15px;
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-    border: none;
-    color: white;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow-dark);
-    animation: fadeInUp 0.8s ease-out 0.4s both;
-    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .hero .btn:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-hover);
-    color: white;
-}
-
-@keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
 /* ======================
-   SECTIONS & CONTAINERS
+   SECTIONS
    ====================== */
-
-section {
-    padding: 5rem 0;
-}
 
 .section-title {
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    color: var(--text-primary);
     position: relative;
     display: inline-block;
     width: 100%;
 }
 
 .highlight {
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
 /* ======================
-   NEUMORPHIC CARDS
+   CARDS
    ====================== */
 
-.neo-card {
-    background: var(--bg-primary);
-    border-radius: 20px;
-    box-shadow: var(--shadow-dark);
-    padding: 2rem;
+.intro-box, .bg-card, .method-card, .chart-card, .conclusion-box {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    position: relative;
-    overflow: hidden;
 }
 
-.neo-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.neo-card:hover {
-    box-shadow: var(--shadow-hover);
-    transform: translateY(-8px);
-}
-
-.neo-card:hover::before {
-    opacity: 1;
-}
-
-.neo-card h4, .neo-card h5 {
-    color: var(--accent-primary);
-    font-weight: 700;
-    margin-bottom: 1rem;
-}
-
-.neo-card p {
-    color: var(--text-secondary);
-    line-height: 1.8;
-}
-
-/* Intro & Conclusion Boxes */
 .intro-box, .conclusion-box {
-    background: var(--bg-primary);
-    border-radius: 20px;
-    box-shadow: var(--shadow-dark);
-    padding: 2.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    transition: all 0.3s ease;
+    padding: 2rem;
+    border-left: 5px solid var(--primary);
+}
+
+.bg-card, .method-card {
+    padding: 2rem;
+    border-left: 4px solid var(--primary);
+}
+
+.chart-card {
+    padding: 2rem;
 }
 
 .intro-box:hover, .conclusion-box:hover {
-    box-shadow: var(--shadow-hover);
-    transform: translateY(-10px);
+    box-shadow: 0 10px 35px rgba(102, 126, 234, 0.15);
 }
 
-/* ======================
-   HIGHLIGHT BOXES
-   ====================== */
+.bg-card:hover {
+    box-shadow: 0 10px 35px rgba(102, 126, 234, 0.15);
+    transform: translateX(5px);
+}
+
+.chart-card:hover {
+    box-shadow: 0 10px 35px rgba(102, 126, 234, 0.15);
+}
 
 .highlight-box {
-    background: var(--bg-secondary);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.1) 100%);
     padding: 1.5rem;
-    border-radius: 15px;
+    border-radius: 10px;
     margin-top: 1.5rem;
-    box-shadow: var(--shadow-inset);
+    border-left: 4px solid var(--primary);
     display: flex;
     align-items: center;
     gap: 1rem;
-    border: 1px solid rgba(102, 126, 234, 0.1);
 }
 
 .highlight-box i {
-    font-size: 1.8rem;
-    color: var(--accent-primary);
+    font-size: 1.5rem;
+    color: var(--primary);
 }
-
-.highlight-box strong {
-    color: var(--accent-primary);
-    font-weight: 600;
-}
-
-/* ======================
-   PLACEHOLDER BOX
-   ====================== */
 
 .placeholder-box {
-    background: var(--bg-primary);
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     min-height: 400px;
-    border-radius: 20px;
+    border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     gap: 1rem;
-    color: var(--text-secondary);
+    color: #666;
     font-size: 1.2rem;
-    box-shadow: var(--shadow-dark);
-    border: 2px dashed rgba(102, 126, 234, 0.2);
-    transition: all 0.3s ease;
-}
-
-.placeholder-box:hover {
-    box-shadow: var(--shadow-hover);
-    border-color: rgba(102, 126, 234, 0.4);
 }
 
 .placeholder-box i {
     font-size: 4rem;
-    color: var(--accent-primary);
     opacity: 0.3;
 }
 
@@ -385,47 +270,26 @@ section {
    ====================== */
 
 .goal-card {
-    background: var(--bg-primary);
+    background: white;
     padding: 2rem;
-    border-radius: 20px;
+    border-radius: 15px;
     text-align: center;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow-dark);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
     position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    overflow: hidden;
-}
-
-.goal-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease;
+    border-top: 3px solid var(--primary);
 }
 
 .goal-card:hover {
-    transform: translateY(-12px);
-    box-shadow: var(--shadow-hover);
-}
-
-.goal-card:hover::before {
-    transform: scaleX(1);
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
 }
 
 .goal-number {
     font-size: 3rem;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    opacity: 0.2;
+    color: var(--primary);
+    opacity: 0.1;
     position: absolute;
     top: 10px;
     right: 20px;
@@ -433,23 +297,23 @@ section {
 
 .goal-card i {
     font-size: 3rem;
-    color: var(--accent-primary);
+    color: var(--primary);
     margin-bottom: 1rem;
 }
 
 .goal-card h4 {
     margin-bottom: 1rem;
-    font-weight: 700;
-    color: var(--text-primary);
+    font-weight: 600;
+    color: var(--dark);
 }
 
 .goal-card p {
-    color: var(--text-secondary);
+    color: #666;
     line-height: 1.6;
 }
 
 /* ======================
-   LISTS & CUSTOM STYLES
+   LISTS & FORMULAS
    ====================== */
 
 .custom-list {
@@ -459,19 +323,9 @@ section {
 
 .custom-list li {
     padding: 0.8rem 0;
-    color: var(--text-secondary);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    line-height: 1.7;
-    position: relative;
-    padding-left: 1.5rem;
-}
-
-.custom-list li::before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    color: var(--accent-primary);
-    font-weight: 700;
+    color: #555;
+    border-bottom: 1px solid #f0f0f0;
+    line-height: 1.6;
 }
 
 .custom-list li:last-child {
@@ -479,56 +333,42 @@ section {
 }
 
 .custom-list strong {
-    color: var(--accent-primary);
-    font-weight: 700;
+    color: var(--primary);
 }
 
-/* ======================
-   FORMULA BOX
-   ====================== */
-
 .formula-box {
-    background: var(--bg-secondary);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.05) 100%);
     padding: 1.5rem;
-    border-radius: 15px;
+    border-radius: 10px;
     margin-top: 1rem;
-    box-shadow: var(--shadow-inset);
-    border: 1px solid rgba(102, 126, 234, 0.15);
+    border: 1px solid rgba(102, 126, 234, 0.2);
 }
 
 .formula-box p {
     margin: 0.5rem 0;
-    font-weight: 700;
-    color: var(--accent-primary);
+    font-weight: 600;
+    color: var(--primary);
     font-size: 1.1rem;
 }
 
 .formula-card {
-    background: var(--bg-primary);
+    background: white;
     padding: 2rem;
-    border-radius: 20px;
-    box-shadow: var(--shadow-dark);
-    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border: 2px solid var(--primary);
     text-align: center;
-    transition: all 0.3s ease;
-}
-
-.formula-card:hover {
-    box-shadow: var(--shadow-hover);
-    border-color: rgba(102, 126, 234, 0.4);
 }
 
 .formula-text {
     font-size: 1.8rem;
-    color: var(--accent-primary);
+    color: var(--primary);
     font-weight: 700;
-    padding: 1.5rem;
-    background: var(--bg-secondary);
-    border-radius: 12px;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(240, 147, 251, 0.05) 100%);
+    border-radius: 10px;
     margin: 1rem 0;
     font-family: 'Courier New', monospace;
-    box-shadow: var(--shadow-inset);
-    border: 1px solid rgba(102, 126, 234, 0.1);
 }
 
 /* ======================
@@ -547,8 +387,7 @@ section {
     top: 0;
     bottom: 0;
     width: 3px;
-    background: linear-gradient(180deg, var(--accent-primary) 0%, var(--accent-secondary) 50%, var(--accent-tertiary) 100%);
-    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+    background: linear-gradient(180deg, var(--primary) 0%, var(--accent) 100%);
 }
 
 .timeline-item {
@@ -563,45 +402,31 @@ section {
     top: 5px;
     width: 60px;
     height: 60px;
-    background: var(--bg-primary);
-    border: 3px solid var(--accent-primary);
+    background: white;
+    border: 4px solid var(--primary);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--shadow-dark);
-    font-weight: 700;
-    color: var(--accent-primary);
-    transition: all 0.3s ease;
-}
-
-.timeline-item:hover .timeline-marker {
-    box-shadow: var(--shadow-hover);
-    transform: scale(1.1);
+    box-shadow: 0 3px 15px rgba(102, 126, 234, 0.3);
 }
 
 .timeline-content {
-    background: var(--bg-primary);
+    background: white;
     padding: 1.5rem;
-    border-radius: 15px;
-    box-shadow: var(--shadow-dark);
-    border-left: 4px solid var(--accent-primary);
-    transition: all 0.3s ease;
-}
-
-.timeline-content:hover {
-    box-shadow: var(--shadow-hover);
-    transform: translateX(5px);
+    border-radius: 10px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid var(--primary);
 }
 
 .timeline-content h5 {
-    color: var(--accent-primary);
+    color: var(--primary);
     margin-bottom: 0.5rem;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .timeline-content p {
-    color: var(--text-secondary);
+    color: #666;
     margin: 0;
 }
 
@@ -609,36 +434,32 @@ section {
    DATA TABLES
    ====================== */
 
-.table-responsive {
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: var(--shadow-dark);
-}
-
 .data-table {
     width: 100%;
     border-collapse: collapse;
-    background: var(--bg-primary);
+    background: white;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .data-table thead {
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     color: white;
 }
 
 .data-table th {
     padding: 1.2rem;
-    font-weight: 700;
+    font-weight: 600;
     text-align: center;
     font-size: 0.95rem;
-    border-bottom: none;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .data-table td {
     padding: 1rem 1.2rem;
     text-align: center;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    color: var(--text-secondary);
+    border-bottom: 1px solid #f0f0f0;
 }
 
 .data-table tbody tr {
@@ -646,8 +467,8 @@ section {
 }
 
 .data-table tbody tr:hover {
-    background-color: var(--bg-secondary);
-    box-shadow: inset 0 2px 8px rgba(102, 126, 234, 0.1);
+    background-color: rgba(102, 126, 234, 0.05);
+    transform: scale(1.01);
 }
 
 .data-table tbody tr:last-child td {
@@ -656,12 +477,12 @@ section {
 
 .data-table td:first-child {
     text-align: left;
-    font-weight: 700;
-    color: var(--accent-primary);
+    font-weight: 600;
+    color: var(--primary);
 }
 
-.negative { color: #e74c3c; font-weight: 700; }
-.positive { color: #1dd1a1; font-weight: 700; }
+.negative { color: #e74c3c; font-weight: 600; }
+.positive { color: #27ae60; font-weight: 600; }
 
 /* ======================
    CHARTS
@@ -676,43 +497,28 @@ section {
 }
 
 .comp-btn {
-    padding: 0.8rem 1.8rem;
-    background: var(--bg-primary);
-    color: var(--accent-primary);
-    border: 2px solid transparent;
-    border-radius: 12px;
+    padding: 0.6rem 1.5rem;
+    border: 2px solid var(--primary);
+    background: white;
+    color: var(--primary);
+    border-radius: 25px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow-dark);
 }
 
 .comp-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-hover);
-    border-color: var(--accent-primary);
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
 .comp-btn.active {
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     color: white;
-    box-shadow: var(--shadow-hover);
     border-color: transparent;
-}
-
-/* Chart Card */
-.chart-card {
-    background: var(--bg-primary);
-    padding: 2rem;
-    border-radius: 20px;
-    box-shadow: var(--shadow-dark);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    transition: all 0.3s ease;
-}
-
-.chart-card:hover {
-    box-shadow: var(--shadow-hover);
-    transform: translateY(-8px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
 }
 
 /* ======================
@@ -720,35 +526,23 @@ section {
    ====================== */
 
 .finding-card {
-    background: var(--bg-primary);
-    padding: 1.8rem;
-    border-radius: 15px;
-    box-shadow: var(--shadow-dark);
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+    border-top: 4px solid var(--primary);
     transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    position: relative;
-    overflow: hidden;
-}
-
-.finding-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
 }
 
 .finding-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-hover);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
 }
 
 .finding-card h5 {
-    color: var(--accent-primary);
+    color: var(--primary);
     margin-bottom: 1rem;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .finding-card i {
@@ -761,69 +555,47 @@ section {
    ====================== */
 
 .team-card {
-    background: var(--bg-primary);
+    background: white;
     padding: 2rem;
-    border-radius: 20px;
-    box-shadow: var(--shadow-dark);
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
     text-align: center;
     transition: all 0.3s ease;
     position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    overflow: hidden;
-}
-
-.team-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+    border-top: 5px solid var(--primary);
 }
 
 .team-card:hover {
-    transform: translateY(-12px);
-    box-shadow: var(--shadow-hover);
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
 }
 
 .team-avatar {
-    width: 90px;
-    height: 90px;
-    margin: -45px auto 1rem;
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    width: 80px;
+    height: 80px;
+    margin: -40px auto 1rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     color: white;
-    border-radius: 20px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
-    box-shadow: var(--shadow-dark);
-    transition: all 0.3s ease;
-}
-
-.team-card:hover .team-avatar {
-    transform: scale(1.1) rotateY(10deg);
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
 }
 
 .team-card h4 {
-    color: var(--text-primary);
+    color: var(--dark);
     margin-bottom: 0.5rem;
     font-weight: 700;
 }
 
 .team-card .role {
-    color: var(--accent-primary);
+    color: var(--primary);
     font-size: 0.9rem;
-    font-weight: 700;
+    font-weight: 600;
     margin-bottom: 1rem;
-    background: var(--bg-secondary);
-    padding: 0.4rem 0.8rem;
-    border-radius: 8px;
-    display: inline-block;
-    box-shadow: var(--shadow-inset);
 }
 
 .team-list {
@@ -835,10 +607,10 @@ section {
 
 .team-list li {
     padding: 0.6rem 0;
-    color: var(--text-secondary);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    color: #666;
+    border-bottom: 1px solid #f0f0f0;
     font-size: 0.95rem;
-    line-height: 1.6;
+    line-height: 1.5;
 }
 
 .team-list li:last-child {
@@ -856,21 +628,10 @@ section {
 }
 
 .conclusion-list li {
-    padding: 1.2rem 0;
-    color: var(--text-secondary);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1rem 0;
+    color: #555;
+    border-bottom: 1px solid #f0f0f0;
     line-height: 1.8;
-    position: relative;
-    padding-left: 1.5rem;
-}
-
-.conclusion-list li::before {
-    content: '▸';
-    position: absolute;
-    left: 0;
-    color: var(--accent-primary);
-    font-weight: 700;
-    font-size: 1.2rem;
 }
 
 .conclusion-list li:last-child {
@@ -878,32 +639,23 @@ section {
 }
 
 .conclusion-list strong {
-    color: var(--accent-primary);
-    font-weight: 700;
+    color: var(--primary);
 }
 
 .highlight-section {
-    background: var(--bg-secondary);
-    padding: 2.5rem;
-    border-radius: 20px;
-    box-shadow: var(--shadow-inset);
-    border: 2px solid rgba(102, 126, 234, 0.15);
-    transition: all 0.3s ease;
-}
-
-.highlight-section:hover {
-    border-color: rgba(102, 126, 234, 0.3);
-    box-shadow: var(--shadow-dark);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(240, 147, 251, 0.1) 100%);
+    padding: 2rem;
+    border-radius: 15px;
+    border-left: 5px solid var(--primary);
 }
 
 .highlight-section h5 {
-    color: var(--accent-primary);
+    color: var(--primary);
     font-weight: 700;
-    margin-bottom: 1rem;
 }
 
 .highlight-section strong {
-    color: var(--accent-primary);
+    color: var(--primary);
     font-weight: 700;
 }
 
@@ -912,7 +664,7 @@ section {
    ====================== */
 
 .footer {
-    background: linear-gradient(135deg, #2d3436 0%, #1e272e 100%);
+    background: var(--dark);
     color: #bbb;
     padding: 3rem 0 1rem;
     margin-top: 3rem;
@@ -931,21 +683,18 @@ section {
 }
 
 .footer-links li {
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.5rem;
 }
 
 .footer-links a {
     color: #bbb;
     text-decoration: none;
     transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
 }
 
 .footer-links a:hover {
-    color: var(--accent-primary);
-    transform: translateX(5px);
+    color: var(--primary);
+    margin-left: 5px;
 }
 
 .references-list {
@@ -954,21 +703,12 @@ section {
 }
 
 .references-list li {
-    margin-bottom: 1.2rem;
-    line-height: 1.8;
-    padding-left: 1.5rem;
-    position: relative;
-}
-
-.references-list li::before {
-    content: '📚';
-    position: absolute;
-    left: 0;
+    margin-bottom: 1rem;
+    line-height: 1.7;
 }
 
 .references-list em {
     color: #aaa;
-    font-style: italic;
 }
 
 /* ======================
@@ -976,46 +716,45 @@ section {
    ====================== */
 
 @media (max-width: 768px) {
-    .hero h1 { font-size: 2.2rem; }
+    .hero h1 { font-size: 2rem; }
     .hero .lead { font-size: 1rem; }
-    .section-title { font-size: 2rem; }
+    .section-title { font-size: 1.8rem; }
     .timeline::before { left: 15px; }
     .timeline-item { padding-left: 70px; }
-    .timeline-marker { width: 45px; height: 45px; font-size: 1rem; left: -7.5px; }
+    .timeline-marker { width: 45px; height: 45px; font-size: 1.2rem; left: -7.5px; }
     .data-table th, .data-table td { padding: 0.8rem 0.5rem; font-size: 0.85rem; }
     .chart-controls { flex-direction: column; }
     .comp-btn { width: 100%; }
     .team-card { margin-top: 2rem; }
-    .neo-card, .goal-card, .formula-card, .chart-card, .intro-box, .conclusion-box {
-        padding: 1.5rem;
-    }
 }
 
 @media (max-width: 576px) {
     .hero { min-height: 80vh; padding: 1rem; }
-    .hero h1 { font-size: 1.6rem; margin-bottom: 0.5rem; }
-    .hero .lead { font-size: 0.95rem; margin-bottom: 1.5rem; }
+    .hero h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .hero .lead { font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .intro-box, .bg-card, .goal-card, .method-card, .team-card, .chart-card, .conclusion-box { padding: 1.5rem; }
     .section-title { font-size: 1.5rem; }
     .placeholder-box { min-height: 250px; }
-    .formula-text { font-size: 1.3rem; }
-    .goal-number { font-size: 2.5rem; }
-    .goal-card i { font-size: 2.5rem; }
-    .team-avatar { width: 70px; height: 70px; margin-top: -35px; font-size: 2rem; }
+    .formula-text { font-size: 1.2rem; }
+    .goal-number { font-size: 2rem; }
+    .goal-card i { font-size: 2rem; }
+    .team-avatar { width: 60px; height: 60px; margin-top: -30px; font-size: 1.5rem; }
 }
 
+/* Print styles */
 @media print {
     .navbar, .footer { display: none; }
-    body { color: #000; background: white; }
+    body { color: #000; }
     .btn, .chart-controls { display: none; }
 }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top" style="top: 0; z-index: 1000;">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
         <div class="container">
             <a class="navbar-brand fw-bold" href="#home">
-                <i class="fas fa-thermometer-half"></i> Heatwave
+                <i class="fas fa-thermometer-half"></i> Heatwave Prediction
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -1037,42 +776,40 @@ section {
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-content">
-            <h1 class="display-3 fw-bold mb-3">
+            <h1 class="display-3 fw-bold mb-3" data-aos="fade-up">
                 Understanding Heatwave Prediction<br>through Data Assimilation
             </h1>
-            <p class="lead mb-4">
+            <p class="lead mb-4" data-aos="fade-up" data-aos-delay="200">
                 Initial Condition Sensitivity · EnKF · Observation Density · Heatwave Forecasting
             </p>
-            <a href="#intro" class="btn">
-                <i class="fas fa-arrow-down"></i> Explore
+            <a href="#intro" class="btn btn-lg btn-light" data-aos="fade-up" data-aos-delay="400">
+                <i class="fas fa-arrow-down"></i> Learn More
             </a>
         </div>
     </section>
 
     <!-- Introduction -->
-    <section id="intro" class="py-5">
+    <section id="intro" class="py-5 bg-light">
         <div class="container">
-            <div class="row align-items-center g-4">
-                <div class="col-lg-6">
+            <div class="row align-items-center">
+                <div class="col-lg-6" data-aos="fade-right">
                     <div class="intro-box">
                         <h2 class="section-title mb-4">
-                            <span class="highlight">Introduction</span>
+                            <span class="highlight">Introduction & Goal</span>
                         </h2>
-                        <p class="fs-5 mb-3" style="color: var(--text-secondary);">
+                        <p class="fs-5 mb-3">
                             Heatwaves are among the most impactful extreme weather events. Accurate prediction is important for public safety, energy demand, and climate risk management.
                         </p>
-                        <p class="fs-5 mb-3" style="color: var(--text-secondary);">
+                        <p class="fs-5 mb-3">
                             However, numerical weather prediction is highly sensitive to initial conditions, meaning small errors in the initial atmospheric state can grow into large forecast errors.
                         </p>
                         <div class="highlight-box">
                             <i class="fas fa-lightbulb"></i>
-                            <div>
-                                <strong>Key Insight:</strong> Data assimilation can significantly improve model predictions by combining observations with model forecasts.
-                            </div>
+                            <strong>Key:</strong> Data assimilation can significantly improve model predictions.
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-6" data-aos="fade-left">
                     <div class="placeholder-box">
                         <i class="fas fa-chart-line"></i>
                         <p>Visualization Area</p>
@@ -1085,11 +822,11 @@ section {
     <!-- Research Goals -->
     <section id="goals" class="py-5">
         <div class="container">
-            <h2 class="section-title text-center mb-5">
+            <h2 class="section-title text-center mb-5" data-aos="fade-up">
                 <span class="highlight">Research Goals</span>
             </h2>
             <div class="row g-4">
-                <div class="col-lg-4">
+                <div class="col-lg-4" data-aos="fade-up">
                     <div class="goal-card">
                         <div class="goal-number">01</div>
                         <i class="fas fa-chart-bar"></i>
@@ -1097,15 +834,15 @@ section {
                         <p>Investigate how forecast error changes during normal and heatwave years.</p>
                     </div>
                 </div>
-                <div class="col-lg-4">
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
                     <div class="goal-card">
                         <div class="goal-number">02</div>
                         <i class="fas fa-map-marker"></i>
                         <h4>Goal 2</h4>
-                        <p>Analyze how observation density affects data assimilation performance.</p>
+                        <p>Analyze how observation density affects DA performance.</p>
                     </div>
                 </div>
-                <div class="col-lg-4">
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
                     <div class="goal-card">
                         <div class="goal-number">03</div>
                         <i class="fas fa-filter"></i>
@@ -1118,28 +855,28 @@ section {
     </section>
 
     <!-- Background -->
-    <section id="background" class="py-5">
+    <section id="background" class="py-5 bg-light">
         <div class="container">
-            <h2 class="section-title text-center mb-5">
+            <h2 class="section-title text-center mb-5" data-aos="fade-up">
                 <span class="highlight">Data Assimilation Background</span>
             </h2>
             
             <div class="row g-4">
-                <div class="col-lg-6">
-                    <div class="neo-card">
-                        <h4><i class="fas fa-brain"></i> Data Assimilation Concept</h4>
-                        <p class="mb-3">
+                <div class="col-lg-6" data-aos="fade-right">
+                    <div class="bg-card">
+                        <h4 class="mb-4"><i class="fas fa-brain"></i> Data Assimilation Concept</h4>
+                        <p class="fs-5 mb-3">
                             Data assimilation combines model background information with observations to produce a more accurate atmospheric state called the analysis.
                         </p>
                         <div class="formula-box">
-                            <p>⚡ analysis = background + Kalman gain × innovation</p>
+                            <p><strong>analysis = background + Kalman gain × innovation</strong></p>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-6">
-                    <div class="neo-card">
-                        <h4><i class="fas fa-database"></i> Data Definition</h4>
+                <div class="col-lg-6" data-aos="fade-left">
+                    <div class="bg-card">
+                        <h4 class="mb-4"><i class="fas fa-database"></i> Data Definition</h4>
                         <ul class="custom-list">
                             <li><strong>Background:</strong> ERA5 model estimate</li>
                             <li><strong>Observation:</strong> ASOS measured temperature</li>
@@ -1151,7 +888,7 @@ section {
             </div>
 
             <div class="row g-4 mt-3">
-                <div class="col-12">
+                <div class="col-12" data-aos="fade-up">
                     <div class="formula-card">
                         <h5 class="mb-3">Kalman Gain Equation</h5>
                         <div class="formula-text">
@@ -1171,20 +908,20 @@ section {
     <!-- Method -->
     <section id="method" class="py-5">
         <div class="container">
-            <h2 class="section-title text-center mb-5">
+            <h2 class="section-title text-center mb-5" data-aos="fade-up">
                 <span class="highlight">Research Method</span>
             </h2>
 
-            <div class="row mb-5 g-4">
-                <div class="col-lg-6">
-                    <h4 class="mb-4"><i class="fas fa-database"></i> Data & Regions</h4>
-                    <div class="neo-card">
+            <div class="row mb-5">
+                <div class="col-lg-6" data-aos="fade-right">
+                    <h4 class="mb-4"><i class="fas fa-database"></i> Data</h4>
+                    <div class="method-card">
                         <ul class="custom-list">
                             <li><strong>ERA5:</strong> 2m temperature data for July–August 2021 and 2024</li>
                             <li><strong>ASOS:</strong> Surface temperature observations</li>
                         </ul>
                     </div>
-                    <div class="neo-card mt-4">
+                    <div class="method-card mt-4">
                         <h5 class="mb-3">Study Regions</h5>
                         <ul class="custom-list">
                             <li><strong>SE:</strong> Seoul/Gyeonggi (observation-dense region)</li>
@@ -1193,7 +930,7 @@ section {
                     </div>
                 </div>
 
-                <div class="col-lg-6">
+                <div class="col-lg-6" data-aos="fade-left">
                     <div class="placeholder-box">
                         <i class="fas fa-map"></i>
                         <p>Map Visualization Area</p>
@@ -1201,33 +938,33 @@ section {
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row" data-aos="fade-up">
                 <div class="col-12">
                     <h4 class="mb-4"><i class="fas fa-timeline"></i> Research Timeline</h4>
                     <div class="timeline">
                         <div class="timeline-item">
-                            <div class="timeline-marker">1</div>
+                            <div class="timeline-marker"></div>
                             <div class="timeline-content">
                                 <h5>Stage 1: Data Preparation</h5>
                                 <p>ERA5 & ASOS data collection and preprocessing</p>
                             </div>
                         </div>
                         <div class="timeline-item">
-                            <div class="timeline-marker">2</div>
+                            <div class="timeline-marker"></div>
                             <div class="timeline-content">
                                 <h5>Stage 2: EnKF Implementation</h5>
                                 <p>Kalman gain calculation and assimilation module development</p>
                             </div>
                         </div>
                         <div class="timeline-item">
-                            <div class="timeline-marker">3</div>
+                            <div class="timeline-marker"></div>
                             <div class="timeline-content">
                                 <h5>Stage 3: Time Analysis</h5>
                                 <p>2021 vs 2024 heatwave performance comparison</p>
                             </div>
                         </div>
                         <div class="timeline-item">
-                            <div class="timeline-marker">4</div>
+                            <div class="timeline-marker"></div>
                             <div class="timeline-content">
                                 <h5>Stage 4: Spatial Analysis</h5>
                                 <p>Observation density impact analysis (SE vs GW)</p>
@@ -1240,14 +977,14 @@ section {
     </section>
 
     <!-- Results -->
-    <section id="results" class="py-5">
+    <section id="results" class="py-5 bg-light">
         <div class="container">
-            <h2 class="section-title text-center mb-5">
+            <h2 class="section-title text-center mb-5" data-aos="fade-up">
                 <span class="highlight">Research Results</span>
             </h2>
 
             <!-- Time Analysis -->
-            <div class="row mb-5">
+            <div class="row mb-5" data-aos="fade-up">
                 <div class="col-12">
                     <h4 class="mb-4"><i class="fas fa-clock"></i> Time Analysis: 2021 vs 2024</h4>
                     <div class="table-responsive">
@@ -1298,12 +1035,12 @@ section {
 
             <!-- Charts Row -->
             <div class="row g-4 mb-5">
-                <div class="col-lg-6">
+                <div class="col-lg-6" data-aos="fade-right">
                     <div class="chart-card">
                         <canvas id="timeChart"></canvas>
                     </div>
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-6" data-aos="fade-left">
                     <div class="chart-card">
                         <canvas id="spatialChart"></canvas>
                     </div>
@@ -1311,7 +1048,7 @@ section {
             </div>
 
             <!-- Spatial Analysis -->
-            <div class="row mb-5">
+            <div class="row mb-5" data-aos="fade-up">
                 <div class="col-12">
                     <h4 class="mb-4"><i class="fas fa-map-marker"></i> Spatial Analysis: SE vs GW OSE Experiment</h4>
                     <div class="table-responsive">
@@ -1353,7 +1090,7 @@ section {
             </div>
 
             <!-- Interactive Comparison Chart -->
-            <div class="row mb-5">
+            <div class="row mb-5" data-aos="fade-up">
                 <div class="col-12">
                     <div class="chart-card">
                         <div class="chart-controls">
@@ -1373,7 +1110,7 @@ section {
             </div>
 
             <!-- Key Findings -->
-            <div class="row g-4">
+            <div class="row g-4" data-aos="fade-up">
                 <div class="col-lg-6">
                     <div class="finding-card">
                         <h5><i class="fas fa-check-circle"></i> SE Region Characteristics</h5>
@@ -1401,12 +1138,12 @@ section {
     <!-- Team -->
     <section id="team" class="py-5">
         <div class="container">
-            <h2 class="section-title text-center mb-5">
+            <h2 class="section-title text-center mb-5" data-aos="fade-up">
                 <span class="highlight">Research Team</span>
             </h2>
 
             <div class="row g-4">
-                <div class="col-lg-6">
+                <div class="col-lg-6" data-aos="fade-up">
                     <div class="team-card">
                         <div class="team-avatar">A</div>
                         <h4>Member A — Data Pipeline</h4>
@@ -1420,7 +1157,7 @@ section {
                     </div>
                 </div>
 
-                <div class="col-lg-6">
+                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
                     <div class="team-card">
                         <div class="team-avatar">B</div>
                         <h4>Member B — EnKF Core</h4>
@@ -1434,7 +1171,7 @@ section {
                     </div>
                 </div>
 
-                <div class="col-lg-6">
+                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
                     <div class="team-card">
                         <div class="team-avatar">C</div>
                         <h4>Member C — Time Analysis</h4>
@@ -1448,7 +1185,7 @@ section {
                     </div>
                 </div>
 
-                <div class="col-lg-6">
+                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
                     <div class="team-card">
                         <div class="team-avatar">D</div>
                         <h4>Member D — Spatial Analysis</h4>
@@ -1466,13 +1203,13 @@ section {
     </section>
 
     <!-- Conclusion -->
-    <section id="conclusion" class="py-5">
+    <section id="conclusion" class="py-5 bg-light">
         <div class="container">
-            <h2 class="section-title text-center mb-5">
+            <h2 class="section-title text-center mb-5" data-aos="fade-up">
                 <span class="highlight">Conclusion</span>
             </h2>
 
-            <div class="row">
+            <div class="row" data-aos="fade-up">
                 <div class="col-lg-8 mx-auto">
                     <div class="conclusion-box">
                         <ul class="conclusion-list">
@@ -1496,7 +1233,7 @@ section {
                 </div>
             </div>
 
-            <div class="row mt-5">
+            <div class="row mt-5" data-aos="fade-up">
                 <div class="col-12">
                     <div class="highlight-section">
                         <h5 class="mb-3">🔍 Key Insight</h5>
@@ -1511,7 +1248,7 @@ section {
     </section>
 
     <!-- References -->
-    <section class="py-5" style="background: var(--bg-primary);">
+    <section class="py-5 bg-dark text-light">
         <div class="container">
             <h4 class="mb-4"><i class="fas fa-book"></i> References</h4>
             <ul class="references-list">
@@ -1545,7 +1282,7 @@ section {
                     </p>
                 </div>
             </div>
-            <hr style="border-color: rgba(255,255,255,0.1);">
+            <hr>
             <div class="text-center text-muted">
                 <p>&copy; 2026 Heatwave Prediction & Data Assimilation Research Team. All rights reserved.</p>
             </div>
@@ -1561,16 +1298,6 @@ section {
 // Initialize AOS
 AOS.init({ duration: 1000, once: true, offset: 100 });
 
-// Navbar scroll effect
-window.addEventListener('scroll', function() {
-    const navbar = document.querySelector('.navbar');
-    if (window.scrollY > 50) {
-        navbar.classList.add('scrolled');
-    } else {
-        navbar.classList.remove('scrolled');
-    }
-});
-
 // Chart configuration
 const chartConfig = {
     plugins: {
@@ -1579,7 +1306,7 @@ const chartConfig = {
         }
     },
     scales: {
-        y: { beginAtZero: true, grid: { color: 'rgba(102, 126, 234, 0.05)' } },
+        y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
         x: { grid: { display: false } }
     }
 };
@@ -1598,7 +1325,7 @@ if (timeChartCtx) {
                     backgroundColor: 'rgba(238, 90, 111, 0.8)',
                     borderColor: 'rgba(238, 90, 111, 1)',
                     borderWidth: 2,
-                    borderRadius: 8
+                    borderRadius: 5
                 },
                 {
                     label: 'Analysis RMSE',
@@ -1606,7 +1333,7 @@ if (timeChartCtx) {
                     backgroundColor: 'rgba(102, 126, 234, 0.8)',
                     borderColor: 'rgba(102, 126, 234, 1)',
                     borderWidth: 2,
-                    borderRadius: 8
+                    borderRadius: 5
                 }
             ]
         },
@@ -1624,13 +1351,13 @@ if (spatialChartCtx) {
     new Chart(spatialChartCtx, {
         type: 'radar',
         data: {
-            labels: ['Bg RMSE', 'An RMSE', 'Reduction', 'Improvement', 'Mean Inc.'],
+            labels: ['Background RMSE', 'Analysis RMSE', 'RMSE Reduction', 'Improvement Rate', 'Mean Increment'],
             datasets: [
                 {
                     label: 'SE 2024',
                     data: [0.9939, 0.7560, 0.2378, 23.93, 0.376],
                     borderColor: 'rgba(102, 126, 234, 1)',
-                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    backgroundColor: 'rgba(102, 126, 234, 0.2)',
                     borderWidth: 2,
                     pointBackgroundColor: 'rgba(102, 126, 234, 1)',
                     pointBorderColor: '#fff',
@@ -1640,7 +1367,7 @@ if (spatialChartCtx) {
                     label: 'GW 2024',
                     data: [1.9557, 1.4927, 0.4630, 23.67, 0.843],
                     borderColor: 'rgba(240, 147, 251, 1)',
-                    backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                    backgroundColor: 'rgba(240, 147, 251, 0.2)',
                     borderWidth: 2,
                     pointBackgroundColor: 'rgba(240, 147, 251, 1)',
                     pointBorderColor: '#fff',
@@ -1652,7 +1379,7 @@ if (spatialChartCtx) {
             ...chartConfig,
             responsive: true,
             plugins: { ...chartConfig.plugins, title: { display: true, text: 'Spatial Analysis Comparison: SE vs GW', font: { size: 14, weight: 'bold' } } },
-            scales: { r: { beginAtZero: true, grid: { color: 'rgba(102, 126, 234, 0.1)' } } }
+            scales: { r: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.1)' } } }
         }
     });
 }
@@ -1730,6 +1457,11 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
+window.addEventListener('scroll', function() {
+    const navbar = document.querySelector('.navbar');
+    navbar.style.boxShadow = window.scrollY > 50 ? '0 5px 20px rgba(102, 126, 234, 0.3)' : '0 2px 10px rgba(102, 126, 234, 0.2)';
+});
+
 document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', function() {
         const navbarCollapse = document.querySelector('.navbar-collapse');
@@ -1740,7 +1472,7 @@ document.querySelectorAll('.nav-link').forEach(link => {
 });
 
 console.log('%c🌡️ Heatwave Prediction through Data Assimilation', 'font-size: 16px; font-weight: bold; color: #667eea;');
-console.log('%cNeumorphism Design Edition', 'font-size: 12px; color: #764ba2;');
+console.log('%cAll-in-One English Version', 'font-size: 12px; color: #764ba2;');
     </script>
 </body>
 </html>
